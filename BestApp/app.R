@@ -23,6 +23,11 @@ ui <- fluidPage(
                         min = 1,
                         max = 50,
                         value = 30),
+            actionBttn(
+                inputId = "Id110",
+                label = "Пересчитать", 
+                style = "bordered",
+                color = "success"),
             circle = TRUE, status = "danger",
             icon = icon("gear"), width = "300px",
             
@@ -30,20 +35,29 @@ ui <- fluidPage(
             ),
 
         # Show a plot of the generated distribution
+    progressBar(id = "pb", value = 5, total = 5, status = "info", 
+                display_pct = TRUE, striped = TRUE),
            plotOutput("distPlot")
 
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
 
     output$distPlot <- renderPlot({
         # generate bins based on input$bins from ui.R
+        if (input$Id110 != 0){
+        for (i in 1:5){
+            Sys.sleep(1)
+            updateProgressBar(session = session, id = "pb", value = i, total = 5)
+        }
+        
         x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+        bins <- isolate(seq(min(x), max(x), length.out = input$bins + 1))
 
         # draw the histogram with the specified number of bins
         hist(x, breaks = bins, col = 'darkgray', border = 'white')
+        }
     })
 }
 
